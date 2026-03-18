@@ -1,8 +1,10 @@
 node_modules/
 .context/
+.mise.local.toml
 build/
 native/ghostty_vt.node
 native/ghostty_vt/zig-out/
+native/ghostty_vt/zig/.zig-cache/
 main.js
 *.log
 .DS_Store
