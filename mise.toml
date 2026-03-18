@@ -1,0 +1,53 @@
+[tools]
+bun = "latest"
+node = "22"
+zig = "0.14.1"
+
+[env]
+_.path = ["node_modules/.bin"]
+
+[tasks.install]
+description = "Install dependencies"
+run = "bun install"
+
+[tasks.dev]
+description = "Build JS in watch mode"
+depends = ["install"]
+run = "bun esbuild.config.cjs"
+
+[tasks.build]
+description = "Production JS build"
+depends = ["install"]
+run = "bun esbuild.config.cjs --production"
+
+[tasks."build:native"]
+description = "Build native ghostty_vt (system node-gyp)"
+depends = ["install"]
+run = "node scripts/build-ghostty-vt.mjs && node-gyp rebuild && cp build/Release/ghostty_vt.node native/ghostty_vt.node"
+
+[tasks."build:native:electron"]
+description = "Build native ghostty_vt for Obsidian's Electron"
+depends = ["install"]
+run = """
+node scripts/build-ghostty-vt.mjs && \
+node-gyp rebuild --runtime=electron --target=37.6.0 --dist-url=https://electronjs.org/headers && \
+cp build/Release/ghostty_vt.node native/ghostty_vt.node
+"""
+
+[tasks."build:pty:electron"]
+description = "Rebuild node-pty for Obsidian's Electron"
+depends = ["install"]
+run = "node-gyp rebuild --runtime=electron --target=37.6.0 --dist-url=https://electronjs.org/headers --directory node_modules/node-pty"
+
+[tasks."build:all"]
+description = "Full production build (JS + native + pty for Electron)"
+depends = ["build", "build:native:electron", "build:pty:electron"]
+
+[tasks."clean:native"]
+description = "Remove native build artifacts"
+run = "rm -rf build native/ghostty_vt.node native/ghostty_vt/zig-out"
+
+[tasks."vault:install"]
+description = "Install plugin into an Obsidian vault"
+usage = "vault_path"
+run = "node scripts/vault-install.mjs {{arg(name=\"vault_path\")}}"

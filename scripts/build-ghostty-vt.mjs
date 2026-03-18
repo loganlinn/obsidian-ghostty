@@ -15,39 +15,7 @@ if (!existsSync(ghosttySrc)) {
   );
 }
 
-function findZig() {
-  if (process.env.ZIG) {
-    return process.env.ZIG;
-  }
-
-  const fallback = join(root, ".context", "zig", "zig");
-  if (existsSync(fallback)) {
-    return fallback;
-  }
-
-  const check = spawnSync("zig", ["version"], { encoding: "utf8" });
-  if (check.status === 0) {
-    const version = String(check.stdout || "").trim();
-    if (version === "0.14.1") {
-      return "zig";
-    }
-  }
-  const bootstrap = spawnSync(process.execPath, [
-    join(root, "scripts", "bootstrap-zig.mjs"),
-  ], {
-    stdio: "inherit",
-  });
-
-  if (bootstrap.status === 0 && existsSync(fallback)) {
-    return fallback;
-  }
-
-  throw new Error(
-    "Zig not found. Install Zig 0.14.1 or run `bun run bootstrap:zig`."
-  );
-}
-
-const zig = findZig();
+const zig = process.env.ZIG || "zig";
 const result = spawnSync(
   zig,
   ["build", "-Doptimize=ReleaseFast", "--prefix", prefix],

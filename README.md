@@ -4,35 +4,32 @@ Minimal Obsidian plugin scaffold for a Ghostty-powered terminal view.
 
 ## Development
 
-1. Install dependencies:
-   ```bash
-   bun install
-   ```
-2. Build the native VT core (requires Zig 0.14.1):
-   ```bash
-   bun run build:native
-   ```
-   If running inside Obsidian, build against its Electron headers:
-   ```bash
-   bun run build:native:electron
-   ```
-   Rebuild node-pty for Obsidian’s Electron:
-   ```bash
-   bun run build:pty:electron
-   ```
-3. Build in watch mode:
-   ```bash
-   bun run dev
-   ```
-4. Copy the plugin folder into your vault at `.obsidian/plugins/obsidian-ghostty/` and enable it in Obsidian.
-
-### Native build prerequisites
-
-- Zig 0.14.1 (auto-download with `bun run bootstrap:zig`, or set `ZIG=/path/to/zig`)
-- Ghostty sources are vendored under `vendor/ghostty`
-
-## Build
+Prerequisites: [mise](https://mise.jdx.dev/) — all other tools (zig, node, bun) are managed automatically.
 
 ```bash
-bun run build
+mise install          # install toolchain (zig 0.14.1, node, bun)
+mise run install      # install npm dependencies
+mise run build:all    # full production build (JS + native + pty for Electron)
 ```
+
+See all available tasks with `mise tasks`.
+
+### Individual build steps
+
+```bash
+mise run build                 # production JS bundle
+mise run build:native:electron # native ghostty_vt for Obsidian's Electron
+mise run build:pty:electron    # rebuild node-pty for Obsidian's Electron
+mise run dev                   # JS watch mode
+```
+
+### Install into a vault
+
+```bash
+mise run vault:install /path/to/your/vault
+```
+
+### Notes
+
+- Ghostty sources are vendored under `vendor/ghostty`
+- `ZIG=/path/to/zig` overrides the mise-managed zig if needed
